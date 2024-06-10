@@ -1809,7 +1809,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e865fd8f715cec84e86630e5047d3d5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolution: 4
+  resolution: 100
+  noiseScale: 0.04
+  waveSpeed: 0.3
+  heightScale: 10
 --- !u!23 &2073233136
 MeshRenderer:
   m_ObjectHideFlags: 0

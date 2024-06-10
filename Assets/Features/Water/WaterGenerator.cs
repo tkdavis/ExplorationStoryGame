@@ -6,6 +6,9 @@ using UnityEngine.UIElements;
 public class WaterGenerator : MonoBehaviour
 {
     public int resolution = 4;
+    public float noiseScale = 1.0f;
+    public float waveSpeed = 1.0f;
+    public float heightScale = 1.0f;
     Mesh mesh;
     Vector3[] vertices;
 
@@ -53,11 +56,26 @@ public class WaterGenerator : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        UpdateMesh();
+
+        for (int y = 0; y <= resolution; y++)
+        {
+            for (int x = 0; x <= resolution; x++)
+            {
+                float noiseValue = Mathf.PerlinNoise(x * noiseScale, y * noiseScale + Time.time * waveSpeed);
+                vertices[y * (resolution + 1) + x].y = noiseValue * heightScale;
+            }
+        }
+    }
+
     private void UpdateMesh()
     {
         mesh.Clear();
 
         mesh.vertices = vertices;
         mesh.triangles = triangles;
+        mesh.RecalculateNormals();
     }
 }
