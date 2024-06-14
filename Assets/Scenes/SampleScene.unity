@@ -504,7 +504,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &330585544
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1413,7 +1413,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1927117752}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1812,38 +1812,19 @@ MonoBehaviour:
   resolution: 100
   chunkSize: 100
   waveComponents:
-  - amplitudeRandomness: 0.001
-    frequencyRandomness: 0.0001
+  - waveSpeed: 1
+    amplitudeRandomness: 0.01
+    frequencyRandomness: 0.001
     phaseRandomness: 0
-    perlinScale: 0.5
-    amplitudePerlinFactor: 0.5
+    perlinScale: 0.3
+    amplitudePerlinFactor: 1
     frequencyPerlinFactor: 0
     phasePerlinFactor: 0
     waveDisplacements:
-    - amplitude: 6
-      frequency: 0.5
-      phase: 1
-      direction: {x: 1, y: 0.5}
-    - amplitude: 3.2
-      frequency: 0.5
+    - amplitude: 7
+      frequency: 1
       phase: 0
-      direction: {x: -1, y: -1}
-  - amplitudeRandomness: 0
-    frequencyRandomness: 0.0001
-    phaseRandomness: 0
-    perlinScale: 0.5
-    amplitudePerlinFactor: 0
-    frequencyPerlinFactor: 0
-    phasePerlinFactor: 0
-    waveDisplacements:
-    - amplitude: 6
-      frequency: 0.1
-      phase: 1
-      direction: {x: 1, y: 1}
-    - amplitude: 3.2
-      frequency: 0.1
-      phase: 0
-      direction: {x: -1, y: -0.3}
+      direction: {x: 1, y: 0}
 --- !u!23 &2073233136
 MeshRenderer:
   m_ObjectHideFlags: 0

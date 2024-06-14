@@ -151,7 +151,7 @@ private double ComputeGerstnerWaveHeight(double x, double y, WaveComponent compo
 
         // Calculate wave height
         double dot = displacement.direction.x * x + displacement.direction.y * y;
-        double waveHeight = randomAmplitude * Mathf.Sin((float)(dot * randomFrequency + Time.time * randomFrequency + randomPhase));
+        double waveHeight = randomAmplitude * Mathf.Sin((float)(dot * randomFrequency + Time.time * component.waveSpeed));
         height += waveHeight;
     }
 
@@ -173,6 +173,7 @@ public class WaveDisplacement
 [System.Serializable]
 public class WaveComponent
 {
+    public float waveSpeed = 1;
     public float amplitudeRandomness = 1;
     public float frequencyRandomness = 1;
     public float phaseRandomness = 1;
