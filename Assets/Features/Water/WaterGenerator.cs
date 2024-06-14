@@ -3,27 +3,16 @@ using UnityEngine;
 
 public class WaterGenerator : MonoBehaviour
 {
-    public float horizontalSquishFactor = 1.0f;
     public int resolution = 4;
-    public float waveSpeed = 1.0f;
     public int chunkSize = 10; // Define the size of each chunk
-
-    public float trochoidalAmplitude = 1f;
-    public float trochoidalFrequency = 1f;
-    public float trochoidalPhase = 0f;
-
-    public float amplitudeRandomness = 1;
-    public float frequencyRandomness = 1;
-    public float phaseRandomness = 1;
-
-    public float waveSpeedRandomness = 1.0f;
-
-    public List<WaveDisplacement> waveDisplacements = new List<WaveDisplacement>();
 
     private List<MeshFilter> meshFilters = new List<MeshFilter>();
     private List<MeshRenderer> meshRenderers = new List<MeshRenderer>();
     private Vector3[] vertices;
-    private int[]triangles;
+    private int[] triangles;
+
+    // Define multiple wave components
+    public List<WaveComponent> waveComponents = new List<WaveComponent>();
 
     private void Start()
     {
@@ -95,59 +84,80 @@ public class WaterGenerator : MonoBehaviour
         UpdateMeshes();
     }
 
-private void UpdateMeshes()
-{
-    // Set a random seed for consistent randomness
-    Random.InitState(12345);
-
-    trochoidalPhase += Time.deltaTime * waveSpeed;
-    for (int i = 0; i < meshFilters.Count; i++)
+    private void UpdateMeshes()
     {
-        int startX = (i % (resolution / chunkSize)) * chunkSize;
-        int startY = (i / (resolution / chunkSize)) * chunkSize;
-
-        for (int y = 0; y <= chunkSize; y++)
+        for (int i = 0; i < meshFilters.Count; i++)
         {
-            for (int x = 0; x <= chunkSize; x++)
+            int startX = (i % (resolution / chunkSize)) * chunkSize;
+            int startY = (i / (resolution / chunkSize)) * chunkSize;
+
+            ComputeWaveHeights(startX, startY);
+
+            Mesh mesh = meshFilters[i].mesh;
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+        }
+    }
+
+    private void ComputeWaveHeights(int startX, int startY)
+    {
+        int chunkResolution = chunkSize + 1;
+        double[] heights = new double[chunkResolution * chunkResolution];
+
+        // Generate wave heights for each component
+        foreach (WaveComponent component in waveComponents)
+        {
+            for (int y = 0; y < chunkResolution; y++)
             {
-                float totalDisplacementY = 0f;
-                float totalDisplacementX = 0f;
-
-                // Calculate displacement for each trochoidal wave with random variations
-                foreach (WaveDisplacement displacement in waveDisplacements)
+                for (int x = 0; x < chunkResolution; x++)
                 {
-                    // Generate random variations for amplitude, frequency, and phase
-                    float randomAmplitude = displacement.amplitude * Random.Range(1f - amplitudeRandomness, 1f + amplitudeRandomness);
-                    float randomFrequency = displacement.frequency * Random.Range(1f - frequencyRandomness, 1f + frequencyRandomness);
-                    float randomPhase = displacement.phase + Random.Range(-phaseRandomness, phaseRandomness);
+                    double xPos = (startX + x) * 0.1; // Adjust scaling as needed
+                    double yPos = (startY + y) * 0.1; // Adjust scaling as needed
 
-                    float waveDisplacementY = CalculateTrochoidalWaveDisplacement(x + startX, y + startY, randomAmplitude, randomFrequency, trochoidalPhase + randomPhase, displacement.direction.x, displacement.direction.y);
-                    totalDisplacementY += waveDisplacementY;
-
-                    // Calculate horizontal displacement based on vertical position (y-coordinate)
-                    float waveDisplacementX = waveDisplacementY * horizontalSquishFactor; // Adjust horizontal squish factor as needed
-                    totalDisplacementX += waveDisplacementX;
+                    double height = ComputeGerstnerWaveHeight(xPos, yPos, component);
+                    heights[y * chunkResolution + x] += height; // Accumulate heights from different components
                 }
-
-                // Apply trochoidal wave displacement along the y-axis
-                vertices[y * (chunkSize + 1) + x].y = startY + totalDisplacementY;
-
-                // Apply trochoidal wave displacement along the x-axis
-                vertices[y * (chunkSize + 1) + x].x = startX + x + totalDisplacementX;
             }
         }
 
-        Mesh mesh = meshFilters[i].mesh;
-        mesh.vertices = vertices;
-        mesh.RecalculateNormals();
+        // Apply computed heights to mesh vertices
+        for (int y = 0; y < chunkResolution; y++)
+        {
+            for (int x = 0; x < chunkResolution; x++)
+            {
+                vertices[y * chunkResolution + x].y = (float)heights[y * chunkResolution + x];
+            }
+        }
     }
+
+private double ComputeGerstnerWaveHeight(double x, double y, WaveComponent component)
+{
+    double height = 0.0;
+
+    // Time-dependent offset for variation
+    float offset = Mathf.PerlinNoise(Time.time * component.perlinScale, 0f);
+
+    foreach (WaveDisplacement displacement in component.waveDisplacements)
+    {
+        // Randomly adjust parameters based on Perlin noise
+        float randomAmplitude = displacement.amplitude * Random.Range(1f - component.amplitudeRandomness, 1f + component.amplitudeRandomness);
+        float randomFrequency = displacement.frequency * Random.Range(1f - component.frequencyRandomness, 1f + component.frequencyRandomness);
+        float randomPhase = displacement.phase + Random.Range(-component.phaseRandomness, component.phaseRandomness);
+
+        // Apply Perlin noise offset to random parameters
+        randomAmplitude *= (1f + offset * component.amplitudePerlinFactor);
+        randomFrequency *= (1f + offset * component.frequencyPerlinFactor);
+        randomPhase += offset * component.phasePerlinFactor;
+
+        // Calculate wave height
+        double dot = displacement.direction.x * x + displacement.direction.y * y;
+        double waveHeight = randomAmplitude * Mathf.Sin((float)(dot * randomFrequency + Time.time * randomFrequency + randomPhase));
+        height += waveHeight;
+    }
+
+    return height;
 }
 
-    private float CalculateTrochoidalWaveDisplacement(float x, float y, float amplitude, float frequency, float phase, float directionX, float directionY)
-    {
-        // Calculate the displacement using the trochoidal wave formula with direction
-        return amplitude * Mathf.Sin(2 * Mathf.PI * (frequency * (x * directionX + y * directionY)) + phase);
-    }
 
 }
 
@@ -158,4 +168,18 @@ public class WaveDisplacement
     public float frequency;
     public float phase;
     public Vector2 direction;
+}
+
+[System.Serializable]
+public class WaveComponent
+{
+    public float amplitudeRandomness = 1;
+    public float frequencyRandomness = 1;
+    public float phaseRandomness = 1;
+    public float perlinScale = 1;
+    public float amplitudePerlinFactor = 1;
+    public float frequencyPerlinFactor = 1;
+    public float phasePerlinFactor = 1;
+
+    public List<WaveDisplacement> waveDisplacements = new List<WaveDisplacement>();
 }

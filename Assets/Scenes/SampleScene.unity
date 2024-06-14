@@ -1809,38 +1809,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e865fd8f715cec84e86630e5047d3d5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalSquishFactor: 1
   resolution: 100
-  waveSpeed: 0.3
   chunkSize: 100
-  trochoidalAmplitude: 3
-  trochoidalFrequency: 1.01
-  trochoidalPhase: 0
-  amplitudeRandomness: 0.01
-  frequencyRandomness: 0
-  phaseRandomness: 0.01
-  waveSpeedRandomness: 0.01
-  waveDisplacements:
-  - amplitude: 3.08
-    frequency: 1.015
-    phase: 0
-    direction: {x: 1, y: 1}
-  - amplitude: 3
-    frequency: 1.01
-    phase: 0
-    direction: {x: -1, y: 0}
-  - amplitude: 3
-    frequency: 1.01
-    phase: 0
-    direction: {x: 0, y: -1}
-  - amplitude: 0.5
-    frequency: 1.03
-    phase: 0
-    direction: {x: 0, y: 1}
-  - amplitude: 0.3
-    frequency: 1.01
-    phase: 0
-    direction: {x: 1, y: -1}
+  waveComponents:
+  - amplitudeRandomness: 0.001
+    frequencyRandomness: 0.0001
+    phaseRandomness: 0
+    perlinScale: 0.5
+    amplitudePerlinFactor: 0.5
+    frequencyPerlinFactor: 0
+    phasePerlinFactor: 0
+    waveDisplacements:
+    - amplitude: 6
+      frequency: 0.5
+      phase: 1
+      direction: {x: 1, y: 0.5}
+    - amplitude: 3.2
+      frequency: 0.5
+      phase: 0
+      direction: {x: -1, y: -1}
+  - amplitudeRandomness: 0
+    frequencyRandomness: 0.0001
+    phaseRandomness: 0
+    perlinScale: 0.5
+    amplitudePerlinFactor: 0
+    frequencyPerlinFactor: 0
+    phasePerlinFactor: 0
+    waveDisplacements:
+    - amplitude: 6
+      frequency: 0.1
+      phase: 1
+      direction: {x: 1, y: 1}
+    - amplitude: 3.2
+      frequency: 0.1
+      phase: 0
+      direction: {x: -1, y: -0.3}
 --- !u!23 &2073233136
 MeshRenderer:
   m_ObjectHideFlags: 0
